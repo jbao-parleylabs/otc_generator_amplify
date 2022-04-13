@@ -1,9 +1,10 @@
 import React from "react";
-import { Button, Form, Container, Grid, Header, Segment } from 'semantic-ui-react';
+import { Button, Form, Container, Grid, Header, Segment, Message } from 'semantic-ui-react';
 import './CodeGenerator.css';
 
 function CodeGenerator() {
   const [code, setCode] = React.useState();
+  const [errorState, setErrorState] = React.useState();
 
   const getPostBody = (event) => {
       let postBody = { };
@@ -27,7 +28,12 @@ function CodeGenerator() {
         fetch(recipeUrl, requestMetadata)
             .then(res => res.json())
             .then(data => {
-                console.log(data.body);
+                console.log( JSON.parse(data.body).one_time_code);
+                if(data.statusCode === 200){
+                    setCode(JSON.parse(data.body).one_time_code);
+                } else{
+                    setErrorState("There was an issue generating the code");
+                }
 
             });
   };
@@ -47,6 +53,12 @@ function CodeGenerator() {
                           <br/><br/>
                             <Button type='submit' primary >Generate Code</Button>
                           </Form>
+                          { errorState
+                                   ? (
+                                 <Message negative>
+                                    <Message.Header>{errorState}</Message.Header>
+                                  </Message>
+                                   ) : null }
                       </Segment>
 
                 </Grid.Column>
